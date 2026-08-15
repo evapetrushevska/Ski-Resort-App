@@ -16,22 +16,16 @@ Backend for the Information System for Ski Resort Booking and Resource Managemen
 
 2. Create a `.env` file in the root with your database credentials:
    ```
-   PORT=
-   DB_HOST=
-   DB_USER=
-   DB_PASSWORD=
-   DB_NAME=
+   PORT=30049
+   DB_HOST=localhost
+   DB_USER=studenti
+   DB_PASS=S039C8R7
+   DB_DATABASE=SISIII2026_89231091
+   JWT_SECRET=
    ```
 
 3. Start the server:
    ```
-   npm start
+   npm run dev
    ```
 
-## Folder Structure
-- `src/config` — database connection setup
-- `src/controllers` — request handling logic
-- `src/middleware` — auth checks, error handling
-- `src/models` — MySQL models
-- `src/routes` — API route definitions
-- `src/services` — reusable business logic
