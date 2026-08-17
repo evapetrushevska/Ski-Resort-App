@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Menu from "../components/Menu";
 
 export default function AppRouter() {
   return (
