@@ -7,6 +7,8 @@ export default function AppRouter() {
     <Menu />
       <Routes>
         <Route path="/" element={<h1>Ski Resort App</h1>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );
