@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pool from './db/database.js';
 import authRouter from './routes/auth.js';
+import slopesRouter from './routes/slopes.js';
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.get("/test-db", async (req, res, next) => {
 
 // Auth routes
 app.use("/auth", authRouter);
+
+// Slope routes
+app.use("/slopes", slopesRouter);
 
 // Central error handler
 app.use((error, req, res, next) => {
