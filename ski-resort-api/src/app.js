@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pool from './db/database.js';
 import authRouter from './routes/auth.js';
-import slopesRouter from './routes/slopes.js';
+import slopesRouter from './routes/slopes_route.js';
+import equipmentRouter from './routes/equipment_route.js';
 
 const app = express();
 
@@ -30,10 +31,14 @@ app.use("/auth", authRouter);
 // Slope routes
 app.use("/slopes", slopesRouter);
 
+//Equipment routers
+app.use("/equipment", equipmentRouter);
+
 // Central error handler
 app.use((error, req, res, next) => {
   console.error(error);
   res.status(500).json({ success: false, message: "Internal server error" });
 });
+
 
 export default app;
