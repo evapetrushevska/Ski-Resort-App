@@ -27,7 +27,7 @@ export default function Equipment() {
       <ul>
         {equipment.map((item) => (
           <li key={item.equipment_id}>
-            <strong>{item.name}</strong> ({item.type}) - {item.availability_status}
+            <strong>{item.equipment_name}</strong> ({item.type}) - {item.availability_status}
           </li>
         ))}
       </ul>
