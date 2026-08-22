@@ -5,6 +5,7 @@ import authRouter from './routes/auth.js';
 import slopesRouter from './routes/slopes_route.js';
 import equipmentRouter from './routes/equipment_route.js';
 import authToken from './db/authToken.js';
+import passesRouter from './routes/passes_route.js';
 
 const app = express();
 
@@ -34,6 +35,9 @@ app.use("/slopes", slopesRouter);
 
 //Equipment routers
 app.use("/equipment", equipmentRouter);
+
+//Passes routes 
+app.use("/passes", passesRouter);
 
 // Central error handler
 app.use((error, req, res, next) => {
