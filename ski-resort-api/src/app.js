@@ -4,6 +4,7 @@ import pool from './db/database.js';
 import authRouter from './routes/auth.js';
 import slopesRouter from './routes/slopes_route.js';
 import equipmentRouter from './routes/equipment_route.js';
+import authToken from './db/authToken.js';
 
 const app = express();
 
