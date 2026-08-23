@@ -5,6 +5,7 @@ import Register from "../pages/Register";
 import Home from "../pages/Home";
 import Slopes from "../pages/Slopes";
 import Equipment from "../pages/Equipment";
+import Passes from "../pages/Passes";
 
 export default function AppRouter() {
   return (
@@ -16,6 +17,7 @@ export default function AppRouter() {
         <Route path="/register" element={<Register />} />
         <Route path="/slopes" element={<Slopes />} />
         <Route path="/equipment" element={<Equipment />} />
+        <Route path="/passes" element={<Passes />} />
       </Routes>
     </BrowserRouter>
   );
