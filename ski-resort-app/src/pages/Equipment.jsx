@@ -42,6 +42,13 @@ export default function Equipment() {
     loadMyRentals();
   }, []);
 
+  const handleRentalDate = (value) => {
+    setRentalDate(value);
+    if (returnDate && value && returnDate < value) {
+      setReturnDate("");
+    }
+  };
+
   const handleRent = async (equipmentId) => {
     setMessage("");
 
@@ -52,6 +59,11 @@ export default function Equipment() {
 
     if (!rentalDate || !returnDate) {
       setMessage("Please choose a rental date and return date.");
+      return;
+    }
+
+    if (returnDate < rentalDate) {
+      setMessage("Return date cannot be before the rental date.");
       return;
     }
 
@@ -71,7 +83,7 @@ export default function Equipment() {
         setMessage("Equipment rented successfully.");
         loadMyRentals();
       } else {
-        setMessage(data.message || "Rental failed.");
+        setMessage("Rental failed.");
       }
     } catch (err) {
       console.log("Rental error:", err);
@@ -91,7 +103,7 @@ export default function Equipment() {
         setMessage("Rental cancelled.");
         loadMyRentals();
       } else {
-        setMessage(data.message || "Cancel failed.");
+        setMessage("Cancel failed.");
       }
     } catch (err) {
       console.log("Cancel error:", err);
@@ -109,11 +121,21 @@ export default function Equipment() {
           <h2>Choose your dates</h2>
           <div>
             <label>Rental date</label>
-            <input type="date" value={rentalDate} onChange={(e) => setRentalDate(e.target.value)} />
+            <input
+              type="date"
+              value={rentalDate}
+              onChange={(e) => handleRentalDate(e.target.value)}
+            />
           </div>
           <div>
             <label>Return date</label>
-            <input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} />
+            <input
+              type="date"
+              value={returnDate}
+              min={rentalDate || undefined}
+              disabled={!rentalDate}
+              onChange={(e) => setReturnDate(e.target.value)}
+            />
           </div>
         </section>
       )}

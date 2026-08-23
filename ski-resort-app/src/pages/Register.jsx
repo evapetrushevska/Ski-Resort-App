@@ -25,7 +25,7 @@ export default function Register() {
       if (res.ok) {
         setMessage("Registration successful. You can now log in.");
       }else{
-        setMessage(data.message || "Registration failed.");
+        setMessage("Registration failed.");
       }
     }catch (err) {
       console.log("Register error:", err);

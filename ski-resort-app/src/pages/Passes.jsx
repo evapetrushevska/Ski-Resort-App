@@ -23,7 +23,7 @@ export default function Passes() {
     try {
       const res = await fetch(`${API_URL}/passes/my`, {
         headers: {
-            Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       const data = await res.json();
@@ -39,6 +39,13 @@ export default function Passes() {
     loadMyPasses();
   }, []);
 
+  const handlePassesDate = (value) => {
+    setValidFrom(value);
+    if (validTo && value && validTo < value) {
+      setValidTo("");
+    }
+  };
+
   const handleBook = async (type, price) => {
     setMessage("");
 
@@ -49,6 +56,11 @@ export default function Passes() {
 
     if (!validFrom || !validTo) {
       setMessage("Please choose valid from and valid to dates.");
+      return;
+    }
+
+    if (validTo < validFrom) {
+      setMessage("Valid to date cannot be before the valid from date.");
       return;
     }
 
@@ -110,11 +122,21 @@ export default function Passes() {
             <h2>Choose your dates</h2>
             <div>
               <label>Valid from</label>
-              <input type="date" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} />
+              <input
+                type="date"
+                value={validFrom}
+                onChange={(e) => handlePassesDate(e.target.value)}
+              />
             </div>
             <div>
               <label>Valid to</label>
-              <input type="date" value={validTo} onChange={(e) => setValidTo(e.target.value)} />
+              <input
+                type="date"
+                value={validTo}
+                min={validFrom || undefined}
+                disabled={!validFrom}
+                onChange={(e) => setValidTo(e.target.value)}
+              />
             </div>
           </section>
 
