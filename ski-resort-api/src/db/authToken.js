@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const authToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -9,7 +11,7 @@ const authToken = (req, res, next) => {
         return;
     }
 
-    jwt.verify(token, process.evn.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err){ 
             res.status(403).json({ success: false, message: "Invalid or expired token. Please log in again."});
             return;
