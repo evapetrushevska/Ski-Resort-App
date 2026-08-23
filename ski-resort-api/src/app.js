@@ -6,6 +6,7 @@ import slopesRouter from './routes/slopes_route.js';
 import equipmentRouter from './routes/equipment_route.js';
 import authToken from './db/authToken.js';
 import passesRouter from './routes/passes_route.js';
+import rentalsRouter from './routes/rentals_route.js';
 
 const app = express();
 
@@ -38,6 +39,9 @@ app.use("/equipment", equipmentRouter);
 
 //Passes routes 
 app.use("/passes", passesRouter);
+
+//Rentals routes 
+app.use("/rentals", rentalsRouter);
 
 // Central error handler
 app.use((error, req, res, next) => {
