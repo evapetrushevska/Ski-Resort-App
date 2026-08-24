@@ -11,6 +11,21 @@ export const createBooking = async (userId) => {
 
 };
 
+//is equipment there or not?
+export const isEquipmentAlreadyRented = async (equipmentId, rentalDate, returnDate) => {
+  const [rows] = await pool.query(
+    `SELECT rental.rental_id
+        FROM rental
+        JOIN booking ON rental.booking_id = booking.booking_id
+        WHERE rental.equipment_id = ?
+          AND booking.status != 'cancelled'
+          AND rental.rental_date <= ?
+          AND rental.return_date >= ?`,
+    [equipmentId, returnDate, rentalDate]
+  );
+  return rows.length > 0;
+};
+
 export const createRental = async (bookingId, equipmentId, rentalDate, returnDate) => {
   const [result] = await pool.query(
     `INSERT 
