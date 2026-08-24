@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { API_URL } from "../config/api";
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return day + " " + month + " " + year;
+}
+
 export default function Equipment() {
   const [equipment, setEquipment] = useState([]);
   const [myRentals, setMyRentals] = useState([]);
@@ -164,7 +173,7 @@ export default function Equipment() {
           <ul>
             {myRentals.map((rental) => (
               <li key={rental.rental_id}>
-                {rental.equipment_name} ({rental.rental_date} to {rental.return_date}) - {rental.booking_status}{" "}
+                {rental.equipment_name} ({formatDate(rental.rental_date)} to {formatDate(rental.return_date)}) - {rental.booking_status}{" "}
                 {rental.booking_status !== "cancelled" && (
                   <button onClick={() => handleCancel(rental.rental_id)}>Cancel</button>
                 )}
