@@ -7,6 +7,8 @@ import equipmentRouter from './routes/equipment_route.js';
 import authToken from './db/authToken.js';
 import passesRouter from './routes/passes_route.js';
 import rentalsRouter from './routes/rentals_route.js';
+import instructorsRouter from './routes/instructors_route.js';
+import lessonsRouter from './routes/lessons_route.js';
 
 const app = express();
 
@@ -42,6 +44,12 @@ app.use("/passes", passesRouter);
 
 //Rentals routes 
 app.use("/rentals", rentalsRouter);
+
+//Instructors routes
+app.use("/instructors", instructorsRouter);
+
+//Lessons routes
+app.use("/lessons", lessonsRouter);
 
 // Central error handler
 app.use((error, req, res, next) => {
