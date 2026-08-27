@@ -7,6 +7,7 @@ import Slopes from "../pages/Slopes";
 import Equipment from "../pages/Equipment";
 import Passes from "../pages/Passes";
 import Lessons from "../pages/Lessons";
+import Admin from "../pages/Admin";
 
 export default function AppRouter() {
   return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
         <Route path="/equipment" element={<Equipment />} />
         <Route path="/passes" element={<Passes />} />
         <Route path="/lessons" element={<Lessons />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   );
