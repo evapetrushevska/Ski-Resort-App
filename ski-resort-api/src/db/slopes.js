@@ -20,7 +20,7 @@ export const updateSlopeStatus = async (slopeId, status) => {
   return result;
 };
 
-export const updatetWeather = async (slopeId, temperature, condition) => {
+export const upsertWeather = async (slopeId, temperature, condition) => {
   const [existing] = await pool.query(
     `SELECT weather_id
       FROM weather 

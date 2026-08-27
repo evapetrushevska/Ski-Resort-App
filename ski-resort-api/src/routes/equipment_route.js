@@ -1,5 +1,6 @@
 import express from 'express';
 import { getAllEquipment, updateEquipmentStatus, createEquipment } from '../db/equipment.js';
+import authToken, { requireAdmin } from '../db/authToken.js';
 
 const router = express.Router();
 
@@ -54,7 +55,7 @@ const addEquipment = async (req, res, next) => {
 };
 
 router.get("/", getEquipment);
-router.put("/:id/status", updateStatus);
-router.post("/", addEquipment);
+router.put("/:id/status", authToken, requireAdmin, updateStatus);
+router.post("/", authToken, requireAdmin, addEquipment);
 
 export default router;
