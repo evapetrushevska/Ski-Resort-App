@@ -9,6 +9,7 @@ import passesRouter from './routes/passes_route.js';
 import rentalsRouter from './routes/rentals_route.js';
 import instructorsRouter from './routes/instructors_route.js';
 import lessonsRouter from './routes/lessons_route.js';
+import adminRouter from './routes/admin_route.js';
 
 const app = express();
 
@@ -50,6 +51,9 @@ app.use("/instructors", instructorsRouter);
 
 //Lessons routes
 app.use("/lessons", lessonsRouter);
+
+//Admin routes
+app.use("/admin", adminRouter);
 
 // Central error handler
 app.use((error, req, res, next) => {
