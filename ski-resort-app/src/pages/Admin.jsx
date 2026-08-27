@@ -11,12 +11,28 @@ function formatDate(dateString) {
 }
 
 export default function Admin() {
+  const [summary, setSummary] = useState(null);
   const [reports, setReports] = useState([]);
   const [message, setMessage] = useState("");
 
   const token = localStorage.getItem("token");
   const userJson = localStorage.getItem("user");
   const user = userJson ? JSON.parse(userJson) : null;
+
+  const loadSummary = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/admin/summary`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSummary(data);
+      }
+    } catch (err) {
+      console.log("Error loading summary:", err);
+    }
+  };
 
   const loadReports = async () => {
     if (!token) return;
@@ -28,7 +44,7 @@ export default function Admin() {
       if (res.ok) {
         setReports(data);
       } else {
-        setMessage("Could not load reports.");
+        setMessage(data.message || "Could not load reports.");
       }
     } catch (err) {
       console.log("Error loading reports:", err);
@@ -37,6 +53,7 @@ export default function Admin() {
   };
 
   useEffect(() => {
+    loadSummary();
     loadReports();
   }, []);
 
@@ -51,8 +68,9 @@ export default function Admin() {
       if (res.ok) {
         setMessage("Report generated.");
         loadReports();
+        loadSummary();
       } else {
-        setMessage("Could not generate report.");
+        setMessage(data.message || "Could not generate report.");
       }
     } catch (err) {
       console.log("Generate report error:", err);
@@ -81,6 +99,15 @@ export default function Admin() {
   return (
     <main className="admin-page">
       <h1>Admin Dashboard</h1>
+
+      <section>
+        <h2>Current Totals</h2>
+        {summary ? (
+          <p>Total Bookings: {summary.totalBookings} - Total Revenue: ${summary.totalRevenue}</p>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </section>
 
       <section>
         <button onClick={handleGenerate}>Generate New Report</button>

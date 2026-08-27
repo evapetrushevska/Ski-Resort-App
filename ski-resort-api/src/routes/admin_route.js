@@ -1,8 +1,18 @@
 import express from 'express';
 import authToken, { requireAdmin } from '../db/authToken.js';
-import { generateReport, getAllReports } from '../db/admin.js';
+import { generateReport, getAllReports, getLiveSummary } from '../db/admin.js';
 
 const router = express.Router();
+
+//live current totals 
+const getSummary = async (req, res, next) => {
+  try {
+    const summary = await getLiveSummary();
+    res.json(summary);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const createReport = async (req, res, next) => {
   try {
@@ -23,6 +33,7 @@ const listReports = async (req, res, next) => {
   }
 };
 
+router.get("/summary", authToken, requireAdmin, getSummary);
 router.post("/reports", authToken, requireAdmin, createReport);
 router.get("/reports", authToken, requireAdmin, listReports);
 
