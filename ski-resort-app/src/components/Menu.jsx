@@ -18,7 +18,7 @@ export default function Menu() {
       <Link to="/slopes">Slopes</Link>
       <Link to="/equipment">Equipment</Link>
 
-      {user && (
+      {user && user.role !== "admin" && (
         <>
           <Link to="/passes">Passes</Link>
           <Link to="/lessons">Lessons</Link>
@@ -36,7 +36,7 @@ export default function Menu() {
 
       {user && (
         <>
-          <span>Hi, {user.firstName} ({user.role})</span>
+          <span>Hi, {user.firstName}</span>
           <button onClick={handleLogout}>Logout</button>
         </>
       )}

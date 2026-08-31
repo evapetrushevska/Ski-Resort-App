@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { API_URL } from "../config/api";
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return day + " " + month + " " + year;
+}
+
 const PASS_OPTIONS = [
   { type: "1-Day Pass (Adult)", price: 40 },
   { type: "1-Day Pass (Kids)", price: 25 },
@@ -17,6 +26,13 @@ export default function Passes() {
   const [validTo, setValidTo] = useState("");
 
   const token = localStorage.getItem("token");
+  const userJson = localStorage.getItem("user");
+  const user = userJson ? JSON.parse(userJson) : null;
+
+  const visibleOptions =
+    user && user.role === "instructor"
+      ? PASS_OPTIONS.filter((option) => !option.type.toLowerCase().includes("kids"))
+      : PASS_OPTIONS;
 
   const loadMyPasses = async () => {
     if (!token) return;
@@ -143,7 +159,7 @@ export default function Passes() {
           <section>
             <h2>Available Passes</h2>
             <ul>
-              {PASS_OPTIONS.map((option) => (
+              {visibleOptions.map((option) => (
                 <li key={option.type}>
                   {option.type} - ${option.price}{" "}
                   <button onClick={() => handleBook(option.type, option.price)}>Book</button>
@@ -160,7 +176,7 @@ export default function Passes() {
             <ul>
               {myPasses.map((pass) => (
                 <li key={pass.pass_id}>
-                  {pass.type} - ${pass.price} ({pass.valid_from} to {pass.valid_to}) - {pass.booking_status}{" "}
+                  {pass.type} - ${pass.price} ({formatDate(pass.valid_from)} to {formatDate(pass.valid_to)}) - {pass.booking_status}{" "}
                   {pass.booking_status !== "cancelled" && (
                     <button onClick={() => handleCancel(pass.pass_id)}>Cancel</button>
                   )}
