@@ -15,8 +15,10 @@ export default function Equipment() {
   const [myRentals, setMyRentals] = useState([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
   const [rentalDate, setRentalDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const token = localStorage.getItem("token");
 
@@ -51,7 +53,7 @@ export default function Equipment() {
     loadMyRentals();
   }, []);
 
-  const handleRentalDate = (value) => {
+  const handleRentalDateChange = (value) => {
     setRentalDate(value);
     if (returnDate && value && returnDate < value) {
       setReturnDate("");
@@ -60,19 +62,27 @@ export default function Equipment() {
 
   const handleRent = async (equipmentId) => {
     setMessage("");
+    setMessageType("");
 
+    const errors = {};
     if (!token) {
       setMessage("Please log in to rent equipment.");
+      setMessageType("error");
       return;
     }
+    if (!rentalDate) errors.rentalDate = "Please choose a rental date.";
+    if (!returnDate) errors.returnDate = "Please choose a return date.";
+    setFieldErrors(errors);
 
-    if (!rentalDate || !returnDate) {
-      setMessage("Please choose a rental date and return date.");
+    if (Object.keys(errors).length > 0) {
+      setMessage("Please fix the highlighted fields.");
+      setMessageType("error");
       return;
     }
 
     if (returnDate < rentalDate) {
       setMessage("Return date cannot be before the rental date.");
+      setMessageType("error");
       return;
     }
 
@@ -90,18 +100,24 @@ export default function Equipment() {
 
       if (res.ok) {
         setMessage("Equipment rented successfully.");
+        setMessageType("success");
+        setFieldErrors({});
         loadMyRentals();
+        loadEquipment();
       } else {
         setMessage("Rental failed.");
+        setMessageType("error");
       }
     } catch (err) {
       console.log("Rental error:", err);
       setMessage("Something went wrong. Please try again.");
+      setMessageType("error");
     }
   };
 
   const handleCancel = async (rentalId) => {
     setMessage("");
+    setMessageType("");
     try {
       const res = await fetch(`${API_URL}/rentals/${rentalId}`, {
         method: "DELETE",
@@ -110,33 +126,39 @@ export default function Equipment() {
       const data = await res.json();
       if (res.ok) {
         setMessage("Rental cancelled.");
+        setMessageType("success");
         loadMyRentals();
+        loadEquipment();
       } else {
         setMessage("Cancel failed.");
+        setMessageType("error");
       }
     } catch (err) {
       console.log("Cancel error:", err);
       setMessage("Something went wrong. Please try again.");
+      setMessageType("error");
     }
   };
 
   return (
     <main className="equipment-page">
       <h1>Equipment Rental</h1>
-      {error && <p>{error}</p>}
+      {error && <p className="form-message error">{error}</p>}
 
       {token && (
         <section>
           <h2>Choose your dates</h2>
-          <div>
+          <div className="field">
             <label>Rental date</label>
             <input
               type="date"
               value={rentalDate}
-              onChange={(e) => handleRentalDate(e.target.value)}
+              onChange={(e) => handleRentalDateChange(e.target.value)}
+              className={fieldErrors.rentalDate ? "input-error" : ""}
             />
+            {fieldErrors.rentalDate && <p className="field-error">{fieldErrors.rentalDate}</p>}
           </div>
-          <div>
+          <div className="field">
             <label>Return date</label>
             <input
               type="date"
@@ -144,7 +166,9 @@ export default function Equipment() {
               min={rentalDate || undefined}
               disabled={!rentalDate}
               onChange={(e) => setReturnDate(e.target.value)}
+              className={fieldErrors.returnDate ? "input-error" : ""}
             />
+            {fieldErrors.returnDate && <p className="field-error">{fieldErrors.returnDate}</p>}
           </div>
         </section>
       )}
@@ -164,7 +188,7 @@ export default function Equipment() {
         </ul>
       </section>
 
-      {message && <p>{message}</p>}
+      {message && <p className={`form-message ${messageType}`}>{message}</p>}
 
       {token && (
         <section>
@@ -173,7 +197,8 @@ export default function Equipment() {
           <ul>
             {myRentals.map((rental) => (
               <li key={rental.rental_id}>
-                {rental.equipment_name} ({formatDate(rental.rental_date)} to {formatDate(rental.return_date)}) - {rental.booking_status}{" "}
+                {rental.equipment_name} ({formatDate(rental.rental_date)} to {formatDate(rental.return_date)}) -{" "}
+                {rental.booking_status}{" "}
                 {rental.booking_status !== "cancelled" && (
                   <button onClick={() => handleCancel(rental.rental_id)}>Cancel</button>
                 )}

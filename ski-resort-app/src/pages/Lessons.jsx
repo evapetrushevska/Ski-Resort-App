@@ -286,7 +286,7 @@ export default function Lessons() {
   if (user.role === "admin") {
     return (
       <main className="lessons-page">
-        <h1>All Lessons (Read-Only)</h1>
+        <h1>All Lessons</h1>
 
         <section>
           {allLessons.length === 0 && <p>No lessons booked yet.</p>}
