@@ -68,5 +68,12 @@ export const cancelRental = async (bookingId) => {
         WHERE booking_id = ?`,
     [bookingId]
   );
+
+  await pool.query(
+    `UPDATE equipment 
+      SET availability_status = 'available' 
+      WHERE equipment_id = ?`,
+    [equipmentId]
+  );
   return result;
 };

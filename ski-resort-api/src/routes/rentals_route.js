@@ -57,7 +57,7 @@ const cancelMyRental = async (req, res, next) => {
       return;
     }
 
-    await cancelRental(rental.booking_id);
+    await cancelRental(rental.booking_id, rental.equipment_id);
 
     res.status(200).json({ success: true, message: "Rental cancelled." });
   } catch (error) {
