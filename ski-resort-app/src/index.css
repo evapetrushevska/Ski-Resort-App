@@ -282,3 +282,27 @@ button:hover {
   background-color: #e5e7eb;
   text-decoration: none;
 }
+
+/*Passes */
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+ 
+.price-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+ 
+.price-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+ 
+.price-card p {
+  margin: 2px 0;
+  color: #4b5563;
+}
