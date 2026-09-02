@@ -237,3 +237,48 @@ button:hover {
   color: #ffffff;
   border-color: #2563eb;
 }
+
+/* Home page hero and quick links */
+.hero {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.hero h1 {
+  margin-bottom: 8px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+}
+
+.quick-links li {
+  border: none;
+  padding: 0;
+}
+
+.quick-links a {
+  display: block;
+  background-color: #f3f4f6;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  color: #1f2937;
+}
+
+.quick-links a:hover {
+  background-color: #e5e7eb;
+  text-decoration: none;
+}
