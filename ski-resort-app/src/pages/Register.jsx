@@ -21,6 +21,7 @@ export default function Register() {
     if (!lastName.trim()) errors.lastName = "Last name is required.";
     if (!email.trim()) errors.email = "Email is required.";
     if (!password.trim()) errors.password = "Password is required.";
+    if (!phone.trim()) errors.phone = "Phone number is required.";
     if (role === "instructor" && !specialization.trim()) {
       errors.specialization = "Specialization is required for instructors.";
     }
@@ -120,12 +121,14 @@ export default function Register() {
             {fieldErrors.password && <p className="field-error">{fieldErrors.password}</p>}
           </div>
           <div className="field">
-            <label>Phone number</label>
+            <label>Phone number *</label>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              className={fieldErrors.phone ? "input-error" : ""}
             />
+            {fieldErrors.phone && <p className="field-error">{fieldErrors.phone}</p>}
           </div>
           <div className="field">
             <label>I am registering as *</label>
