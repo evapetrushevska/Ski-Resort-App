@@ -58,7 +58,7 @@ export default function Slopes() {
         setNewName("");
         loadSlopes();
       } else {
-        setMessage(data.message || "Could not add slope.");
+        setMessage("Could not add slope.");
       }
     } catch (err) {
       console.log("Add slope error:", err);
