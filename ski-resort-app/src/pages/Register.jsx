@@ -13,6 +13,7 @@ export default function Register() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [phone, setPhone] = useState("");
 
   const validate = () => {
     const errors = {};
@@ -50,6 +51,7 @@ export default function Register() {
           lastName,
           email,
           password,
+          phone,
           role,
           specialization: role === "instructor" ? specialization : undefined,
         }),
@@ -116,6 +118,14 @@ export default function Register() {
               className={fieldErrors.password ? "input-error" : ""}
             />
             {fieldErrors.password && <p className="field-error">{fieldErrors.password}</p>}
+          </div>
+          <div className="field">
+            <label>Phone number</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
           <div className="field">
             <label>I am registering as *</label>

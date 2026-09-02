@@ -26,19 +26,20 @@ export const findUserByEmail = async (email) => {
 export const getRoleIdByName = async (roleName) => {
   const [rows] = await pool.query(
     `SELECT role_id 
-     FROM role 
-     WHERE role_name = ?`,
+      FROM role 
+      WHERE role_name = ?`,
     [roleName]
   );
   if (rows.length === 0) return null;
   return rows[0].role_id;
 };
 
-export const createUser = async (firstName, lastName, email, hashedPassword, roleId) => {
+export const createUser = async (firstName, lastName, email, hashedPassword, roleId, phone) => {
   const [result] = await pool.query(
-    `INSERT INTO user (first_name, last_name, email, password, role_id) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [firstName, lastName, email, hashedPassword, roleId]
+    `INSERT 
+      INTO user (first_name, last_name, email, password, role_id, phone) 
+      VALUES (?, ?, ?, ?, ?, ?)`,
+    [firstName, lastName, email, hashedPassword, roleId, phone || null]
   );
   return result;
 };
