@@ -10,29 +10,106 @@ function statusClass(status) {
 export default function Slopes() {
   const [slopes, setSlopes] = useState([]);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [newName, setNewName] = useState("");
+  const [newDifficulty, setNewDifficulty] = useState("easy");
+
+  const token = localStorage.getItem("token");
+  const userJson = localStorage.getItem("user");
+  const user = userJson ? JSON.parse(userJson) : null;
+
+  const loadSlopes = async () => {
+    try {
+      const res = await fetch(`${API_URL}/slopes`);
+      const data = await res.json();
+      setSlopes(data);
+    } catch (err) {
+      console.log("Error loading slopes:", err);
+      setError("Could not load slopes.");
+    }
+  };
 
   useEffect(() => {
-    async function loadSlopes() {
-      try {
-        const res = await fetch(`${API_URL}/slopes`);
-        const data = await res.json();
-        setSlopes(data);
-      } catch (err) {
-        console.log("Error loading slopes:", err);
-        setError("Could not load slopes.");
-      }
-    }
     loadSlopes();
   }, []);
+
+  const handleAddSlope = async (event) => {
+    event.preventDefault();
+    setMessage("");
+
+    if (!newName.trim()) {
+      setMessage("Please enter a slope name.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/slopes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ slopeName: newName, difficulty: newDifficulty }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage("Slope added.");
+        setNewName("");
+        loadSlopes();
+      } else {
+        setMessage(data.message || "Could not add slope.");
+      }
+    } catch (err) {
+      console.log("Add slope error:", err);
+      setMessage("Something went wrong. Please try again.");
+    }
+  };
+
+  const filteredSlopes =
+    filter === "all" ? slopes : slopes.filter((slope) => slope.difficulty === filter);
 
   return (
     <main className="slopes-page">
       <h1>Slopes & Weather</h1>
+
+      {user && user.role === "admin" && (
+        <section>
+          <h2>Add a Slope</h2>
+          <form onSubmit={handleAddSlope}>
+            <div>
+              <label>Slope name</label>
+              <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            </div>
+            <div>
+              <label>Difficulty</label>
+              <select value={newDifficulty} onChange={(e) => setNewDifficulty(e.target.value)}>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="expert">Expert</option>
+              </select>
+            </div>
+            <button type="submit">Add Slope</button>
+          </form>
+          {message && <p>{message}</p>}
+        </section>
+      )}
+
+      <section>
+        <label>Filter by difficulty</label>
+        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <option value="all">All</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="expert">Expert</option>
+        </select>
+      </section>
+
       <section>
         {error && <p>{error}</p>}
-        {slopes.length === 0 && !error && <p>No slopes available yet.</p>}
+        {filteredSlopes.length === 0 && !error && <p>No slopes match this filter.</p>}
         <ul>
-          {slopes.map((slope) => (
+          {filteredSlopes.map((slope) => (
             <li key={slope.slope_id}>
               <span>
                 <strong>{slope.slope_name}</strong> ({slope.difficulty})

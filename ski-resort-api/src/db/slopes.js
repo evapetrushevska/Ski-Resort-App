@@ -10,6 +10,15 @@ export const getAllSlopes = async () => {
   return rows;
 };
 
+export const addSlope = async (slopeName, difficulty) => {
+  const [result] = await pool.query(
+    `INSERT INTO slope (slope_name, difficulty, status)
+        VALUES (?, ?, 'open')`,
+    [slopeName, difficulty]
+  );
+  return result;
+};
+
 export const updateSlopeStatus = async (slopeId, status) => {
   const [result] = await pool.query(
     `UPDATE slope 
