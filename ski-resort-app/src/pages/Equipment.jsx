@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config/api";
 
 function formatDate(dateString) {
@@ -11,6 +12,7 @@ function formatDate(dateString) {
 }
 
 export default function Equipment() {
+  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [myRentals, setMyRentals] = useState([]);
   const [error, setError] = useState("");
@@ -19,7 +21,6 @@ export default function Equipment() {
   const [rentalDate, setRentalDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
-
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState("");
 
@@ -27,6 +28,18 @@ export default function Equipment() {
   const userJson = localStorage.getItem("user");
   const user = userJson ? JSON.parse(userJson) : null;
   const isAdmin = user && user.role === "admin";
+
+  const availableEquipment = equipment.filter(
+    (item) => item.availability_status === "available"
+  );
+
+  const handleAuthExpired = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setMessage("Your session expired. Please log in again.");
+    setMessageType("error");
+    setTimeout(() => navigate("/login"), 1200);
+  };
 
   const loadEquipment = async () => {
     try {
@@ -45,6 +58,10 @@ export default function Equipment() {
       const res = await fetch(`${API_URL}/rentals/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (res.status === 403) {
+        handleAuthExpired();
+        return;
+      }
       const data = await res.json();
       if (res.ok) {
         setMyRentals(data);
@@ -63,9 +80,14 @@ export default function Equipment() {
     event.preventDefault();
     setMessage("");
     setMessageType("");
+    setFieldErrors({});
 
-    if (!newName.trim() || !newType.trim()) {
-      setMessage("Please fill in the equipment name and type.");
+    const errors = {};
+    if (!newName.trim()) errors.newName = "Equipment name is required.";
+    if (!newType.trim()) errors.newType = "Type is required.";
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setMessage("Please fix the highlighted fields.");
       setMessageType("error");
       return;
     }
@@ -79,6 +101,12 @@ export default function Equipment() {
         },
         body: JSON.stringify({ name: newName, type: newType }),
       });
+
+      if (res.status === 403) {
+        handleAuthExpired();
+        return;
+      }
+
       const data = await res.json();
       if (res.ok) {
         setMessage("Equipment added and marked available for rental.");
@@ -107,25 +135,23 @@ export default function Equipment() {
   const handleRent = async (equipmentId) => {
     setMessage("");
     setMessageType("");
+    setFieldErrors({});
 
-    const errors = {};
     if (!token) {
       setMessage("Please log in to rent equipment.");
       setMessageType("error");
       return;
     }
+
+    const errors = {};
     if (!rentalDate) errors.rentalDate = "Please choose a rental date.";
     if (!returnDate) errors.returnDate = "Please choose a return date.";
-    setFieldErrors(errors);
-
-    if (Object.keys(errors).length > 0) {
-      setMessage("Please fix the highlighted fields.");
-      setMessageType("error");
-      return;
+    if (rentalDate && returnDate && returnDate < rentalDate) {
+      errors.returnDate = "Return date cannot be before the rental date.";
     }
-
-    if (returnDate < rentalDate) {
-      setMessage("Return date cannot be before the rental date.");
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setMessage("Please fix the highlighted fields.");
       setMessageType("error");
       return;
     }
@@ -140,8 +166,12 @@ export default function Equipment() {
         body: JSON.stringify({ equipmentId, rentalDate, returnDate }),
       });
 
-      const data = await res.json();
+      if (res.status === 403) {
+        handleAuthExpired();
+        return;
+      }
 
+      const data = await res.json();
       if (res.ok) {
         setMessage("Equipment rented successfully.");
         setMessageType("success");
@@ -167,6 +197,12 @@ export default function Equipment() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (res.status === 403) {
+        handleAuthExpired();
+        return;
+      }
+
       const data = await res.json();
       if (res.ok) {
         setMessage("Rental cancelled.");
@@ -192,14 +228,27 @@ export default function Equipment() {
       {isAdmin && (
         <section>
           <h2>Add Equipment</h2>
-          <form onSubmit={handleAddEquipment}>
-            <div>
-              <label>Name</label>
-              <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} />
+          <form onSubmit={handleAddEquipment} noValidate>
+            <div className="field">
+              <label>Name *</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className={fieldErrors.newName ? "input-error" : ""}
+              />
+              {fieldErrors.newName && <p className="field-error">{fieldErrors.newName}</p>}
             </div>
-            <div>
-              <label>Type</label>
-              <input type="text" placeholder="e.g. skis, boots, helmet" value={newType} onChange={(e) => setNewType(e.target.value)} />
+            <div className="field">
+              <label>Type *</label>
+              <input
+                type="text"
+                placeholder="e.g. skis, boots, helmet"
+                value={newType}
+                onChange={(e) => setNewType(e.target.value)}
+                className={fieldErrors.newType ? "input-error" : ""}
+              />
+              {fieldErrors.newType && <p className="field-error">{fieldErrors.newType}</p>}
             </div>
             <button type="submit">Add Equipment</button>
           </form>
@@ -235,18 +284,33 @@ export default function Equipment() {
       )}
 
       <section>
-        <h2>Available Equipment</h2>
-        {equipment.length === 0 && !error && <p>No equipment available yet.</p>}
-        <ul>
-          {equipment.map((item) => (
-            <li key={item.equipment_id}>
-              <strong>{item.equipment_name}</strong> ({item.type}) - {item.availability_status}{" "}
-              {!isAdmin && token && item.availability_status === "available" && (
-                <button onClick={() => handleRent(item.equipment_id)}>Rent</button>
-              )}
-            </li>
-          ))}
-        </ul>
+        <h2>{isAdmin ? "All Equipment" : "Available Equipment"}</h2>
+        {isAdmin ? (
+          <>
+            {equipment.length === 0 && !error && <p>No equipment added yet.</p>}
+            <ul>
+              {equipment.map((item) => (
+                <li key={item.equipment_id}>
+                  <strong>{item.equipment_name}</strong> ({item.type}) - {item.availability_status}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            {availableEquipment.length === 0 && !error && <p>No equipment available right now.</p>}
+            <ul>
+              {availableEquipment.map((item) => (
+                <li key={item.equipment_id}>
+                  <strong>{item.equipment_name}</strong> ({item.type}){" "}
+                  {token && (
+                    <button onClick={() => handleRent(item.equipment_id)}>Rent</button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </section>
 
       {message && <p className={`form-message ${messageType}`}>{message}</p>}

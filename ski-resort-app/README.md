@@ -1,16 +1,49 @@
-# React + Vite
+# Ski Resort App
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend for the Information System for Ski Resort Booking and Resource Management — built with React and Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
+- React
+- Vite
+- React Router
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
 
-## React Compiler
+1. Install dependencies:
+   ```
+   npm install
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Set the backend API URL in `src/config/api.js`:
+   ```js
+   export const API_URL = "http://[SERVER_ADDRESS]:30049";
+   ```
 
-## Expanding the Oxlint configuration
+3. Start the development server:
+   ```
+   npm run dev
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+The app will run on the port and host configured in `vite.config.js`.
+
+## Roles and Views
+
+The interface adapts based on the logged-in user's role:
+
+- **Visitor** — books ski passes, lessons, and equipment rentals; views and cancels their own bookings
+- **Instructor** — views their teaching schedule and accepts/declines lesson requests; can only book adult ski passes
+- **Admin** — adds and manages slopes and equipment, opens/closes slopes, and views the dashboard with booking, revenue, lesson, and equipment statistics; cannot make bookings
+
+Registration lets a new user choose between the visitor and instructor role. Admin accounts are assigned manually in the database.
+
+## Folder Structure
+- `src/pages` — one component per page (Home, Login, Register, Slopes, Equipment, Passes, Lessons, Admin)
+- `src/components` — shared components (Menu)
+- `src/routes` — route definitions (AppRouter)
+- `src/config` — API base URL configuration
+- `src/index.css` — global styling
+
+## Notes
+
+- The logged-in user's token and profile are stored in the browser's `localStorage` after login and cleared on logout.
+- Payment on the passes page is simulated for demonstration purposes only; no real payment processing takes place.
