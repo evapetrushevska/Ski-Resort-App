@@ -9,6 +9,11 @@ const bookRental = async (req, res, next) => {
     const { equipmentId, rentalDate, returnDate } = req.body;
     const userId = req.user.userId;
 
+    if (req.user.role === "admin") {
+      res.status(403).json({ success: false, message: "Admins cannot rent equipment." });
+      return;
+    }
+    
     if (!equipmentId || !rentalDate || !returnDate) {
       res.status(400).json({ success: false, message: "equipmentId, rentalDate and returnDate are required." });
       return;
@@ -57,7 +62,7 @@ const cancelMyRental = async (req, res, next) => {
       return;
     }
 
-    await cancelRental(rental.booking_id);
+    await cancelRental(rental.booking_id, rental.equipment_id);
 
     res.status(200).json({ success: true, message: "Rental cancelled." });
   } catch (error) {

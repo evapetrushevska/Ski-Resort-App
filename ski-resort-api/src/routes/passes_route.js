@@ -8,16 +8,26 @@ const bookPass = async (req, res, next) => {
   try {
     const { type, price, validFrom, validTo } = req.body;
     const userId = req.user.userId;
+    const userRole = req.user.role;
+
+    if (userRole === "admin") {
+      res.status(403).json({ success: false, message: "Admins cannot book passes." });
+      return;
+    }
 
     if (!type?.trim() || !price || !validFrom || !validTo) {
       res.status(400).json({ success: false, message: "Type, price, validFrom and validTo are required." });
       return;
     }
 
+    if (userRole === "instructor" && type.toLowerCase().includes("kids")) {
+      res.status(403).json({ success: false, message: "Instructors can only book adult passes." });
+      return;
+    }
+
     const bookingId = await createBooking(userId);
     await createSkiPass(bookingId, type.trim(), price, validFrom, validTo);
-
-    res.status(201).json({ success: true, message: "Ski pass booked successfully."});
+    res.status(201).json({ success: true, message: "Ski pass booked successfully." });
   } catch (error) {
     next(error);
   }
@@ -37,22 +47,17 @@ const cancelMyPass = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.user.userId;
-
     const pass = await getPassById(id);
-
     if (!pass) {
       res.status(404).json({ success: false, message: "Pass not found." });
       return;
     }
-
     if (pass.user_id !== userId) {
-      res.status(403).json({ success: false, message: "You cannot cancel a pass that isn't yours."});
+      res.status(403).json({ success: false, message: "You cannot cancel a pass that isn't yours." });
       return;
     }
-
     await cancelPass(pass.booking_id);
-
-    res.status(200).json({ success: true, message: "Pass cancelled."});
+    res.status(200).json({ success: true, message: "Pass cancelled." });
   } catch (error) {
     next(error);
   }
