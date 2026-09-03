@@ -17,6 +17,7 @@ export default function Lessons() {
   const [schedule, setSchedule] = useState([]);
   const [allLessons, setAllLessons] = useState([]);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const [instructorId, setInstructorId] = useState("");
   const [slopeId, setSlopeId] = useState("");
@@ -100,37 +101,42 @@ export default function Lessons() {
   }, []);
 
   const handleBook = async (event) => {
-    event.preventDefault();
-    setMessage("");
+  event.preventDefault();
+  setMessage("");
+  setMessageType("");
 
-    if (!instructorId || !slopeId || !date || !time) {
-      setMessage("Please choose an instructor, slope, date and time.");
-      return;
+  if (!instructorId || !slopeId || !date || !time) {
+    setMessage("Please choose an instructor, slope, date and time.");
+    setMessageType("error");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/lessons`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ instructorId, slopeId, date, time, capacity: 1 }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setMessage("Lesson requested.");
+      setMessageType("success");
+      loadMyLessons();
+    } else {
+      setMessage("Booking failed.");
+      setMessageType("error");
     }
-
-    try {
-      const res = await fetch(`${API_URL}/lessons`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ instructorId, slopeId, date, time, capacity: 1 }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage("Lesson requested.");
-        loadMyLessons();
-      } else {
-        setMessage("Booking failed.");
-      }
-    } catch (err) {
-      console.log("Booking error:", err);
-      setMessage("Something went wrong. Please try again.");
-    }
-  };
+  } catch (err) {
+    console.log("Booking error:", err);
+    setMessage("Something went wrong. Please try again.");
+    setMessageType("error");
+  }
+};
 
   const handleCancel = async (lessonId) => {
     setMessage("");
@@ -232,7 +238,11 @@ export default function Lessons() {
           </form>
         </section>
 
-        {message && <p>{message}</p>}
+        {message && (
+          <p className={`form-message ${messageType}`}>
+            {message}
+          </p>
+        )}
 
         <section>
           <h2>My Lessons</h2>
@@ -259,7 +269,11 @@ export default function Lessons() {
       <main className="lessons-page">
         <h1>My Teaching Schedule</h1>
 
-        {message && <p>{message}</p>}
+        {message && (
+          <p className={`form-message ${messageType}`}>
+            {message}
+          </p>
+        )}
 
         <section>
           {schedule.length === 0 && <p>No lessons booked with you yet.</p>}
