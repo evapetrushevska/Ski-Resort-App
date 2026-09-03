@@ -18,6 +18,7 @@ export default function Slopes() {
   const token = localStorage.getItem("token");
   const userJson = localStorage.getItem("user");
   const user = userJson ? JSON.parse(userJson) : null;
+  const isAdmin = user && user.role === "admin";
 
   const loadSlopes = async () => {
     try {
@@ -66,14 +67,38 @@ export default function Slopes() {
     }
   };
 
+  const handleToggleStatus = async (slope) => {
+    setMessage("");
+    const newStatus = slope.status === "open" ? "closed" : "open";
+    try {
+      const res = await fetch(`${API_URL}/slopes/${slope.slope_id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        loadSlopes();
+      } else {
+        setMessage("Could not update slope status.");
+      }
+    } catch (err) {
+      console.log("Update status error:", err);
+      setMessage("Something went wrong. Please try again.");
+    }
+  };
+
   const filteredSlopes =
     filter === "all" ? slopes : slopes.filter((slope) => slope.difficulty === filter);
 
   return (
     <main className="slopes-page">
-      <h1>Slopes & Weather</h1>
+      <h1>Slopes</h1>
 
-      {user && user.role === "admin" && (
+      {isAdmin && (
         <section>
           <h2>Add a Slope</h2>
           <form onSubmit={handleAddSlope}>
@@ -91,9 +116,10 @@ export default function Slopes() {
             </div>
             <button type="submit">Add Slope</button>
           </form>
-          {message && <p>{message}</p>}
         </section>
       )}
+
+      {message && <p>{message}</p>}
 
       <section>
         <label>Filter by difficulty</label>
@@ -118,6 +144,11 @@ export default function Slopes() {
                 )}
               </span>
               <span className={statusClass(slope.status)}>{slope.status}</span>
+              {isAdmin && (
+                <button onClick={() => handleToggleStatus(slope)}>
+                  Mark as {slope.status === "open" ? "Closed" : "Open"}
+                </button>
+              )}
             </li>
           ))}
         </ul>

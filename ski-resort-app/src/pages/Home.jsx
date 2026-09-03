@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [mapZoomed, setMapZoomed] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -21,6 +22,19 @@ export default function Home() {
           <p>Book your passes, lessons, and equipment all in one place.</p>
         )}
       </section>
+
+      <img
+        src="//KranjskaGora.jpg"
+        alt="Resort map"
+        className="resort-map-thumbnail"
+        onClick={() => setMapZoomed(true)}
+      />
+
+      {mapZoomed && (
+        <div className="map-overlay" onClick={() => setMapZoomed(false)}>
+          <img src="/KranjskaGora.jpg" alt="Resort map zoomed" className="resort-map-zoomed" />
+        </div>
+      )}
 
       <section>
         <h2>What would you like to do?</h2>
