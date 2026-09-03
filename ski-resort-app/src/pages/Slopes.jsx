@@ -14,6 +14,7 @@ export default function Slopes() {
   const [filter, setFilter] = useState("all");
   const [newName, setNewName] = useState("");
   const [newDifficulty, setNewDifficulty] = useState("easy");
+  const [mapZoomed, setMapZoomed] = useState(false);
 
   const token = localStorage.getItem("token");
   const userJson = localStorage.getItem("user");
@@ -96,7 +97,20 @@ export default function Slopes() {
 
   return (
     <main className="slopes-page">
-      <h1>Slopes</h1>
+      <h1>Slopes & Weather</h1>
+
+      <img
+        src="/KranjskaGora.jpg"
+        alt="Resort map"
+        className="resort-map-thumbnail"
+        onClick={() => setMapZoomed(true)}
+      />
+
+      {mapZoomed && (
+        <div className="map-overlay" onClick={() => setMapZoomed(false)}>
+          <img src="/KranjskaGora.jpg" alt="Resort map zoomed" className="resort-map-zoomed" />
+        </div>
+      )}
 
       {isAdmin && (
         <section>
