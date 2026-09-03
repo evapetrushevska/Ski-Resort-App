@@ -1,6 +1,7 @@
 import express from 'express';
 import authToken from '../db/authToken.js';
 import { createBooking, createRental, getUserRentals, getRentalById, cancelRental, isEquipmentAlreadyRented } from '../db/rentals.js';
+import { updateEquipmentStatus } from '../db/equipment.js';
 
 const router = express.Router();
 
@@ -13,13 +14,12 @@ const bookRental = async (req, res, next) => {
       res.status(403).json({ success: false, message: "Admins cannot rent equipment." });
       return;
     }
-    
+
     if (!equipmentId || !rentalDate || !returnDate) {
       res.status(400).json({ success: false, message: "equipmentId, rentalDate and returnDate are required." });
       return;
     }
 
-    //check if here
     const alreadyRented = await isEquipmentAlreadyRented(equipmentId, rentalDate, returnDate);
     if (alreadyRented) {
       res.status(409).json({ success: false, message: "This equipment is already booked for those dates." });
@@ -28,6 +28,7 @@ const bookRental = async (req, res, next) => {
 
     const bookingId = await createBooking(userId);
     await createRental(bookingId, equipmentId, rentalDate, returnDate);
+    await updateEquipmentStatus(equipmentId, "rented");
 
     res.status(201).json({ success: true, message: "Equipment rental booked successfully." });
   } catch (error) {

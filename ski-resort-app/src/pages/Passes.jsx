@@ -267,7 +267,7 @@ export default function Passes() {
             </section>
           )}
 
-          {message && <p className="form-message.success">{message}</p>}
+          {message && <p className="form-message success">{message}</p>}
 
           <section>
             <h2>My Passes</h2>

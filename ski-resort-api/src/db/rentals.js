@@ -61,7 +61,7 @@ export const getRentalById = async (rentalId) => {
   return rows[0];
 };
 
-export const cancelRental = async (bookingId) => {
+export const cancelRental = async (bookingId, equipmentId) => {
   const [result] = await pool.query(
     `UPDATE booking 
         SET status = 'cancelled'
