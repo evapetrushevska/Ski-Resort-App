@@ -125,7 +125,6 @@ const lookupUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       firstName: user.first_name,
-      lastName: user.last_name,
     });
   } catch (error) {
     next(error);

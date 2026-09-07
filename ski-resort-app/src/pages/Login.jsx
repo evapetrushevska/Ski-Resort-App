@@ -60,7 +60,7 @@ export default function Login() {
     const res = await fetch(`${API_URL}/auth/lookup?email=${encodeURIComponent(email)}`);
     const data = await res.json();
     if (res.ok) {
-      setPrintedName(`${data.firstName} ${data.lastName}`);
+      setPrintedName(`${data.firstName}`);
     } else {
       setPrintedName(data.message || "User not found.");
     }
