@@ -105,6 +105,34 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+const lookupUser = async (req, res, next) => {
+  try {
+    const { email } = req.query;
+
+    if (!email?.trim()) {
+      res.status(400).json({success: false, message: "Email is required."});
+      return;
+    }
+
+    const users = await findUserByEmail(email.trim());
+
+    if (users.length === 0) {
+      res.status(404).json({success: false, message: "No user found with that email."});
+      return;
+    }
+
+    const user = users[0];
+    res.status(200).json({
+      success: true,
+      firstName: user.first_name,
+      lastName: user.last_name,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+router.get("/lookup", lookupUser);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 

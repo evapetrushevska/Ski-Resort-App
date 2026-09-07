@@ -9,6 +9,7 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [printedName, setPrintedName] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,7 +40,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(data.user));
         setTimeout(() => navigate("/"), 800);
       } else {
-        setMessage(data.message || "Login failed");
+        setMessage("Login failed");
         setMessageType("error");
       }
     } catch (err) {
@@ -47,7 +48,27 @@ export default function Login() {
       setMessage("Something went wrong. Please try again.");
       setMessageType("error");
     }
-  };
+  };  
+
+  const handlePrint = async () => {
+  setPrintedName("");
+  if (!email.trim()) {
+    setPrintedName("Please enter an email first.");
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/auth/lookup?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (res.ok) {
+      setPrintedName(`${data.firstName} ${data.lastName}`);
+    } else {
+      setPrintedName(data.message || "User not found.");
+    }
+  } catch (err) {
+    console.log("Lookup error:", err);
+    setPrintedName("Something went wrong.");
+  }
+};
 
   return (
     <main className="login-page">
@@ -75,6 +96,7 @@ export default function Login() {
             {fieldErrors.password && <p className="field-error">{fieldErrors.password}</p>}
           </div>
           <button type="submit">Login</button>
+          <button type="button" onClick={handlePrint}>Print</button>{printedName && <p>{printedName}</p>}
         </form>
         {message && <p className={`form-message ${messageType}`}>{message}</p>}
       </section>
